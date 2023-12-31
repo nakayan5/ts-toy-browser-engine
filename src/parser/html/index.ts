@@ -126,7 +126,7 @@ class Parser {
     const openQuote = this.consumeChar();
     assert(openQuote !== '"' && openQuote !== "'");
     const value = this.consumeWhile((char) => char !== openQuote);
-    assert(this.consumeChar() === openQuote);
+    assert(this.consumeChar() !== openQuote);
     return value;
   }
 

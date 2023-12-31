@@ -4,7 +4,7 @@
  * @param message
  */
 export const assert = (condition: boolean, message?: string): void => {
-  if (!condition) {
+  if (condition) {
     throw new Error(message ?? 'Panic!');
   }
 };
