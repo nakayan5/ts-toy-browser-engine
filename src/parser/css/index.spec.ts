@@ -98,6 +98,7 @@ describe('parseCSS', () => {
   it('class', () => {
     const nodes = parse(`
       .wrap { margin: 40px; }
+      .inner { background: #ffee12; }
       `);
     expect(nodes).toEqual({
       rules: [
@@ -113,6 +114,26 @@ describe('parseCSS', () => {
             {
               name: 'margin',
               value: [40, 'px'],
+            },
+          ],
+        },
+        {
+          selectors: [
+            {
+              tagName: '',
+              id: '',
+              class: ['inner'],
+            },
+          ],
+          declarations: [
+            {
+              name: 'background',
+              value: {
+                r: 255,
+                g: 238,
+                b: 18,
+                a: 255,
+              },
             },
           ],
         },

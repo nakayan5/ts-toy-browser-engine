@@ -157,7 +157,7 @@ class Parser {
   }
 
   private parseColor(): Color {
-    assert(this.consumeChar() !== '#');
+    assert(this.consumeChar() === '#');
     return {
       r: this.parseHexPair(),
       g: this.parseHexPair(),
