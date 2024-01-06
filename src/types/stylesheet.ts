@@ -18,10 +18,11 @@ export interface ToyDeclaration {
   value: Value;
 }
 
-type Value = Keyword | Length | Color;
-type Keyword = string;
-type Length = number;
-interface Color {
+export type Value = Keyword | Length | Color;
+export type Keyword = string;
+export type Length = [number, Unit];
+type Unit = 'px';
+export interface Color {
   r: number;
   g: number;
   b: number;

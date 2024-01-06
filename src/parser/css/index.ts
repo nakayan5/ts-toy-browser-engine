@@ -1,8 +1,12 @@
+import assert from 'assert';
 import {
   type ToySelector,
   type ToyRule,
   type ToyStylesheet,
   type ToyDeclaration,
+  type Value,
+  type Color,
+  type Length,
 } from '../../types/stylesheet';
 
 /**
@@ -31,18 +35,17 @@ class Parser {
     const rules: ToyRule[] = [];
     while (true) {
       this.consumeWhitespace();
-      // TODO: 後でthis.posを消す
-      if (this.eof() || this.pos === 3) {
+      if (this.eof()) {
         break;
       }
 
       const selectors = this.parseSelectors();
       // this.consumeChar(); // consume '{'
-      // const declarations = this.parseDeclarations();
-      // this.consumeChar(); // consume '}'
+      const declarations = this.parseDeclarations();
+      this.consumeChar(); // consume '}'
       rules.push({
         selectors,
-        declarations: [],
+        declarations,
       });
     }
 
@@ -53,7 +56,7 @@ class Parser {
   private parseSelectors(): ToySelector[] {
     const selectors: ToySelector[] = [];
     while (true) {
-      selectors.push(this.parseSimpleSelector());
+      selectors.push(this.parseSelector());
       this.consumeWhitespace();
       if (this.nextChar() === '{') {
         break;
@@ -64,7 +67,7 @@ class Parser {
   }
 
   /** */
-  private parseSimpleSelector(): ToySelector {
+  private parseSelector(): ToySelector {
     const selector: ToySelector = {
       tagName: '',
       id: '',
@@ -93,41 +96,109 @@ class Parser {
     return selector;
   }
 
-  /**  */
-  private parseIdentifier(): string {
-    return this.consumeWhile((char) => {
+  // q: 次の関数は何をしているのか？
+  // a: 次の関数は、identifierをparseしている
+  private parseIdentifier(t?: boolean): string {
+    const value = this.consumeWhile((char) => {
+      if (t === true) {
+        console.log(char);
+      }
       return this.validIdentifierChar(char);
     });
+
+    return value;
   }
 
-  /**  */
+  // q: 次の関数は何をしているのか？
+  // a: 次の関数は、identifierの文字が有効かどうかを判定している
   private validIdentifierChar(char: string): boolean {
-    return /^[a-zA-Z0-9\-_]$/.test(char);
+    return /[a-zA-Z0-9\-_]/.test(char);
   }
 
   /** propertyとvalueをparseする */
   private parseDeclarations(): ToyDeclaration[] {
+    assert.strictEqual(this.consumeChar(), '{');
     const declarations: ToyDeclaration[] = [];
-
     while (true) {
       this.consumeWhitespace();
       if (this.nextChar() === '}') {
-        this.consumeChar();
+        console.log('break');
         break;
       }
       declarations.push(this.parseDeclaration());
+      this.consumeWhitespace();
+      assert(this.nextChar() === ';');
+      this.consumeChar();
     }
-
     return declarations;
   }
 
   private parseDeclaration(): ToyDeclaration {
-    const declaration: ToyDeclaration = {
-      name: '',
-      value: '',
-    };
+    const propertyName = this.parseIdentifier(true);
+    this.consumeWhitespace();
+    assert(this.nextChar() === ':');
+    this.consumeChar();
+    this.consumeWhitespace();
+    const value = this.parseValue();
 
-    return declaration;
+    console.log({ propertyName, value });
+
+    return {
+      name: propertyName,
+      value,
+    };
+  }
+
+  private parseValue(): Value {
+    const nextChar = this.nextChar();
+    // console.log({ nextChar });
+    switch (true) {
+      case /\d/.test(nextChar):
+        return this.parseLength();
+      case nextChar.includes('#'):
+        return this.parseColor();
+      default:
+        return this.parseIdentifier();
+    }
+  }
+
+  private parseColor(): Color {
+    assert(this.consumeChar() !== '#');
+    return {
+      r: this.parseHexPair(),
+      g: this.parseHexPair(),
+      b: this.parseHexPair(),
+      a: 255,
+    };
+  }
+
+  // 2桁の16進数をパースする
+  private parseHexPair(): number {
+    const hex = this.input.substring(this.pos, this.pos + 2);
+    this.pos += 2;
+    return parseInt(hex, 16);
+  }
+
+  private parseLength(): Length {
+    const num = this.parseNumber();
+    const unit = this.parseUnit();
+    return [num, unit];
+  }
+
+  private parseNumber(): number {
+    return parseInt(
+      this.consumeWhile((char) => {
+        return /^[0-9]$/.test(char);
+      }),
+    );
+  }
+
+  private parseUnit(): 'px' {
+    const unit = this.consumeWhile((char) => {
+      return /^[a-z]$/.test(char);
+    });
+    assert(unit === 'px');
+    return 'px';
   }
 
   /** 0個以上の空白文字を消費して捨てる。 */
@@ -136,10 +207,6 @@ class Parser {
       return char === ' ' || char === '\n';
     });
   }
-
-  // private consumeWhitespace(): void {
-  //   this.consumeWhile((char) => /\s/.test(char));
-  // }
 
   /** 指定された条件（test関数）がtrueを返す間、文字を消費し続けます。 */
   private consumeWhile(test: (arg0: string) => boolean): string {
