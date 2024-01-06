@@ -1,10 +1,10 @@
 import { parse } from './index';
 
 describe('parseCSS', () => {
-  // it('empty', () => {
-  //   const nodes = parse('');
-  //   expect(nodes).toEqual({ rules: [] });
-  // });
+  it('empty', () => {
+    const nodes = parse('');
+    expect(nodes).toEqual({ rules: [] });
+  });
 
   it('single rule', () => {
     const nodes = parse(`h1 { color: red; }`);

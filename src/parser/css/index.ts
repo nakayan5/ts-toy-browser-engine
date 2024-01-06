@@ -40,7 +40,6 @@ class Parser {
       }
 
       const selectors = this.parseSelectors();
-      // this.consumeChar(); // consume '{'
       const declarations = this.parseDeclarations();
       this.consumeChar(); // consume '}'
       rules.push({
@@ -96,13 +95,8 @@ class Parser {
     return selector;
   }
 
-  // q: 次の関数は何をしているのか？
-  // a: 次の関数は、identifierをparseしている
   private parseIdentifier(t?: boolean): string {
     const value = this.consumeWhile((char) => {
-      if (t === true) {
-        console.log(char);
-      }
       return this.validIdentifierChar(char);
     });
 
