@@ -12,7 +12,7 @@ import {
 } from '../../types/stylesheet';
 
 /**
- *
+ * style treeを作成する
  * @param node
  * @param stylesheet
  * @returns
@@ -25,10 +25,10 @@ export const createStyleTree = (
   return stylenode;
 };
 
-class StyleNode {
+export class StyleNode {
   node: ToyNode;
   specifiedValues: PropertyMap;
-  children: ToyStyleNode[];
+  children: StyleNode[];
 
   constructor(node: ToyNode, stylesheet: ToyStylesheet) {
     this.node = node;

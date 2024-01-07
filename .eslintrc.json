@@ -17,6 +17,7 @@
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "@typescript-eslint/strict-boolean-expressions": "off"
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "no-case-declarations": "off"
   }
 }
