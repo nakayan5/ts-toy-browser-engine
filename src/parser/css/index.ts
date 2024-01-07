@@ -116,7 +116,6 @@ class Parser {
     while (true) {
       this.consumeWhitespace();
       if (this.nextChar() === '}') {
-        console.log('break');
         break;
       }
       declarations.push(this.parseDeclaration());
@@ -135,8 +134,6 @@ class Parser {
     this.consumeWhitespace();
     const value = this.parseValue();
 
-    console.log({ propertyName, value });
-
     return {
       name: propertyName,
       value,
@@ -145,7 +142,6 @@ class Parser {
 
   private parseValue(): Value {
     const nextChar = this.nextChar();
-    // console.log({ nextChar });
     switch (true) {
       case /\d/.test(nextChar):
         return this.parseLength();
